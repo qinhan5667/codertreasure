@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "publisher": "qinhan",
   "repository": "https://github.com/qinhan5667/codertreasure.git",
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.96.0"
   },
