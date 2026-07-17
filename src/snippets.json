@@ -1,0 +1,796 @@
+{
+  "ts": {
+    "icon": "TS",
+    "ext": "ts",
+    "label": "TypeScript",
+    "snippets": [
+      [
+        {
+          "c": "kw",
+          "t": "interface"
+        },
+        {
+          "c": "type",
+          "t": " User "
+        },
+        {
+          "c": "var",
+          "t": "{ id: "
+        },
+        {
+          "c": "type",
+          "t": "string"
+        },
+        {
+          "c": "var",
+          "t": " }"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "const"
+        },
+        {
+          "c": "fn",
+          "t": " fetchData"
+        },
+        {
+          "c": "var",
+          "t": " = async (id: "
+        },
+        {
+          "c": "type",
+          "t": "string"
+        },
+        {
+          "c": "var",
+          "t": ") => {"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  const"
+        },
+        {
+          "c": "var",
+          "t": " res = await api."
+        },
+        {
+          "c": "fn",
+          "t": "get"
+        },
+        {
+          "c": "var",
+          "t": "<"
+        },
+        {
+          "c": "type",
+          "t": "User"
+        },
+        {
+          "c": "var",
+          "t": ">(`/users/"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  return"
+        },
+        {
+          "c": "var",
+          "t": " res.data;"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "};"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "export class"
+        },
+        {
+          "c": "type",
+          "t": " Service"
+        },
+        {
+          "c": "var",
+          "t": " {"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  async"
+        },
+        {
+          "c": "fn",
+          "t": " load"
+        },
+        {
+          "c": "var",
+          "t": "() { const data = await this.api(); }"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  private"
+        },
+        {
+          "c": "var",
+          "t": " cache = new "
+        },
+        {
+          "c": "type",
+          "t": "Map"
+        },
+        {
+          "c": "var",
+          "t": "<string, "
+        },
+        {
+          "c": "type",
+          "t": "User"
+        },
+        {
+          "c": "var",
+          "t": ">();"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "}"
+        }
+      ]
+    ],
+    "fake": [
+      "import {",
+      "    BaseNodeFactory,",
+      "    CreateSourceFileOptions,",
+      "    EmitHelperFactory,",
+      "    GetCanonicalFileName,",
+      "    MapLike,",
+      "    ModeAwareCache,",
+      "    ModeAwareCacheKey,",
+      "    ModuleResolutionCache,",
+      "    MultiMap,",
+      "    NodeFactoryFlags,",
+      "    OptionsNameMap,"
+    ]
+  },
+  "js": {
+    "icon": "JS",
+    "ext": "js",
+    "label": "JavaScript",
+    "snippets": [
+      [
+        {
+          "c": "kw",
+          "t": "function"
+        },
+        {
+          "c": "fn",
+          "t": " formatUser"
+        },
+        {
+          "c": "var",
+          "t": "(user) {"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  if"
+        },
+        {
+          "c": "var",
+          "t": " (!user) "
+        },
+        {
+          "c": "kw",
+          "t": "return"
+        },
+        {
+          "c": "var",
+          "t": " null;"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  const"
+        },
+        {
+          "c": "var",
+          "t": " { id, name } = user;"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  return"
+        },
+        {
+          "c": "var",
+          "t": " { id, displayName: name };"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "}"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "const"
+        },
+        {
+          "c": "var",
+          "t": " arr = ["
+        },
+        {
+          "c": "num",
+          "t": "1"
+        },
+        {
+          "c": "var",
+          "t": ", "
+        },
+        {
+          "c": "num",
+          "t": "2"
+        },
+        {
+          "c": "var",
+          "t": ", "
+        },
+        {
+          "c": "num",
+          "t": "3"
+        },
+        {
+          "c": "var",
+          "t": "];"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "arr."
+        },
+        {
+          "c": "fn",
+          "t": "map"
+        },
+        {
+          "c": "var",
+          "t": "(x => x * "
+        },
+        {
+          "c": "num",
+          "t": "2"
+        },
+        {
+          "c": "var",
+          "t": ");"
+        }
+      ]
+    ],
+    "fake": [
+      "import { EventEmitter } from 'node:events';",
+      "import childProcess from 'node:child_process';",
+      "import path from 'node:path';",
+      "import fs from 'node:fs';",
+      "import process from 'node:process';",
+      "import { stripVTControlCharacters } from 'node:util';",
+      "import { Argument, humanReadableArgName } from './argument.js';",
+      "import { CommanderError } from './error.js';",
+      "import { Help } from './help.js';",
+      "import { Option, DualOptions } from './option.js';",
+      "import { suggestSimilar } from './suggestSimilar.js';",
+      "export class Command extends EventEmitter {"
+    ]
+  },
+  "py": {
+    "icon": "PY",
+    "ext": "py",
+    "label": "Python",
+    "snippets": [
+      [
+        {
+          "c": "kw",
+          "t": "def"
+        },
+        {
+          "c": "fn",
+          "t": " process"
+        },
+        {
+          "c": "var",
+          "t": "(data):"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "    for"
+        },
+        {
+          "c": "var",
+          "t": " item "
+        },
+        {
+          "c": "kw",
+          "t": "in"
+        },
+        {
+          "c": "var",
+          "t": " data:"
+        }
+      ],
+      [
+        {
+          "c": "fn",
+          "t": "        print"
+        },
+        {
+          "c": "var",
+          "t": "(item."
+        },
+        {
+          "c": "fn",
+          "t": "get"
+        },
+        {
+          "c": "var",
+          "t": "(\"id\"))"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "    return"
+        },
+        {
+          "c": "var",
+          "t": " {\"ok\": "
+        },
+        {
+          "c": "kw",
+          "t": "True"
+        },
+        {
+          "c": "var",
+          "t": "}"
+        }
+      ]
+    ],
+    "fake": [
+      "Heaps are arrays for which a[k] <= a[2*k+1] and a[k] <= a[2*k+2] for",
+      "all k, counting elements from 0.  For the sake of comparison,",
+      "non-existing elements are considered to be infinite.  The interesting",
+      "property of a heap is that a[0] is always its smallest element.",
+      "Usage:",
+      "heap = []            # creates an empty heap",
+      "heappush(heap, item) # pushes a new item on the heap",
+      "item = heappop(heap) # pops the smallest item from the heap",
+      "item = heap[0]       # smallest item on the heap without popping it",
+      "heapify(x)           # transforms list into a heap, in-place, in linear time",
+      "item = heappushpop(heap, item) # pushes a new item and then returns",
+      "item = heapreplace(heap, item) # pops and returns smallest item, and adds"
+    ]
+  },
+  "java": {
+    "icon": "JV",
+    "ext": "java",
+    "label": "Java",
+    "snippets": [
+      [
+        {
+          "c": "kw",
+          "t": "public class"
+        },
+        {
+          "c": "type",
+          "t": " Main"
+        },
+        {
+          "c": "var",
+          "t": " {"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  public static void"
+        },
+        {
+          "c": "fn",
+          "t": " main"
+        },
+        {
+          "c": "var",
+          "t": "(String[] args) {"
+        }
+      ],
+      [
+        {
+          "c": "type",
+          "t": "    System"
+        },
+        {
+          "c": "var",
+          "t": ".out."
+        },
+        {
+          "c": "fn",
+          "t": "println"
+        },
+        {
+          "c": "var",
+          "t": "(\"hello\");"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "  }"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "}"
+        }
+      ]
+    ],
+    "fake": [
+      "package org.springframework.core.io;",
+      "import java.io.File;",
+      "import java.io.IOException;",
+      "import java.io.InputStream;",
+      "import java.io.InputStreamReader;",
+      "import java.net.URI;",
+      "import java.net.URL;",
+      "import java.nio.channels.Channels;",
+      "import java.nio.channels.ReadableByteChannel;",
+      "import java.nio.charset.Charset;",
+      "import java.nio.file.Path;",
+      "import org.jspecify.annotations.Nullable;"
+    ]
+  },
+  "cpp": {
+    "icon": "C++",
+    "ext": "cpp",
+    "label": "C++",
+    "snippets": [
+      [
+        {
+          "c": "kw",
+          "t": "#include"
+        },
+        {
+          "c": "str",
+          "t": " <iostream>"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "int"
+        },
+        {
+          "c": "fn",
+          "t": " main"
+        },
+        {
+          "c": "var",
+          "t": "() {"
+        }
+      ],
+      [
+        {
+          "c": "type",
+          "t": "  std"
+        },
+        {
+          "c": "var",
+          "t": "::cout << "
+        },
+        {
+          "c": "str",
+          "t": "\"hello\""
+        },
+        {
+          "c": "var",
+          "t": " << endl;"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  return"
+        },
+        {
+          "c": "num",
+          "t": "0"
+        },
+        {
+          "c": "var",
+          "t": ";"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "}"
+        }
+      ]
+    ],
+    "fake": [
+      "#ifndef _VECTOR_",
+      "#define _VECTOR_",
+      "#include <yvals_core.h>",
+      "#if _STL_COMPILER_PREPROCESSOR",
+      "#include <__msvc_bit_utils.hpp>",
+      "#include <__msvc_sanitizer_annotate_container.hpp>",
+      "#include <xmemory>",
+      "#if _HAS_CXX17",
+      "#include <xpolymorphic_allocator.h>",
+      "#endif // _HAS_CXX17",
+      "#if _HAS_CXX23",
+      "#include <__msvc_formatter.hpp>"
+    ]
+  },
+  "vue": {
+    "icon": "VU",
+    "ext": "vue",
+    "label": "Vue",
+    "snippets": [
+      [
+        {
+          "c": "tag",
+          "t": "<template>"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "  <"
+        },
+        {
+          "c": "tag",
+          "t": "div"
+        },
+        {
+          "c": "attr",
+          "t": " class"
+        },
+        {
+          "c": "var",
+          "t": "="
+        },
+        {
+          "c": "str",
+          "t": "\"app\""
+        },
+        {
+          "c": "var",
+          "t": ">"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "    {{ msg }}"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "  </"
+        },
+        {
+          "c": "tag",
+          "t": "div"
+        },
+        {
+          "c": "var",
+          "t": ">"
+        }
+      ],
+      [
+        {
+          "c": "tag",
+          "t": "</template>"
+        }
+      ]
+    ],
+    "fake": [
+      "import {",
+      "  type WatchOptions as BaseWatchOptions,",
+      "  type DebuggerOptions,",
+      "  type ReactiveMarker,",
+      "  type WatchCallback,",
+      "  type WatchEffect,",
+      "  type WatchHandle,",
+      "  type WatchSource,",
+      "  watch as baseWatch,",
+      "} from '@vue/reactivity'",
+      "import { type SchedulerJob, SchedulerJobFlags, queueJob } from './scheduler'",
+      "import { EMPTY_OBJ, NOOP, extend, isFunction, isString } from '@vue/shared'"
+    ]
+  },
+  "react": {
+    "icon": "RE",
+    "ext": "jsx",
+    "label": "React",
+    "snippets": [
+      [
+        {
+          "c": "kw",
+          "t": "import"
+        },
+        {
+          "c": "var",
+          "t": " React"
+        },
+        {
+          "c": "kw",
+          "t": " from"
+        },
+        {
+          "c": "str",
+          "t": " \"react\""
+        },
+        {
+          "c": "var",
+          "t": ";"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "export default function"
+        },
+        {
+          "c": "fn",
+          "t": " App"
+        },
+        {
+          "c": "var",
+          "t": "() {"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  const"
+        },
+        {
+          "c": "var",
+          "t": " [count, setCount] = "
+        },
+        {
+          "c": "fn",
+          "t": "useState"
+        },
+        {
+          "c": "var",
+          "t": "(0);"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "  return"
+        },
+        {
+          "c": "var",
+          "t": " <div>Count: {count}</div>"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "}"
+        }
+      ]
+    ],
+    "fake": [
+      "export type ElementType = React$ElementType;",
+      "export type Element<+C> = React$Element<C>;",
+      "export type MixedElement = React$Element<ElementType>;",
+      "export type Key = React$Key;",
+      "export type Node = React$Node;",
+      "export type Context<T> = React.Context<T>;",
+      "export type Portal = React$Portal;",
+      "export type RefSetter<-I> = React.RefSetter<I>;",
+      "export type ElementProps<C> = React$ElementConfig<C>;",
+      "export type ElementConfig<C> = React$ElementConfig<C>;",
+      "export type ElementRef<C> = React.ElementRef<C>;",
+      "export type ChildrenArray<+T> = $ReadOnlyArray<ChildrenArray<T>> | T;"
+    ]
+  },
+  "go": {
+    "icon": "GO",
+    "ext": "go",
+    "label": "Go",
+    "snippets": [
+      [
+        {
+          "c": "kw",
+          "t": "package"
+        },
+        {
+          "c": "var",
+          "t": " main"
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "import"
+        },
+        {
+          "c": "str",
+          "t": " \"fmt\""
+        }
+      ],
+      [
+        {
+          "c": "kw",
+          "t": "func"
+        },
+        {
+          "c": "fn",
+          "t": " main"
+        },
+        {
+          "c": "var",
+          "t": "() {"
+        }
+      ],
+      [
+        {
+          "c": "fn",
+          "t": "  fmt"
+        },
+        {
+          "c": "var",
+          "t": ".Println(\"hello\")"
+        }
+      ],
+      [
+        {
+          "c": "var",
+          "t": "}"
+        }
+      ]
+    ],
+    "fake": [
+      "package http",
+      "import (",
+      "\t\"bufio\"",
+      "\t\"bytes\"",
+      "\t\"context\"",
+      "\t\"crypto/tls\"",
+      "\t\"errors\"",
+      "\t\"fmt\"",
+      "\t\"internal/godebug\"",
+      "\t\"io\"",
+      "\t\"log\"",
+      "\t\"maps\""
+    ]
+  }
+}

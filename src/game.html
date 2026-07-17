@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+  <title>CoderTreasure</title>
+  <style>
+    :root {
+      --bg: #1e1e1e;
+      --fg: #d4d4d4;
+      --sidebar-bg: #181818;
+      --activity-bar-bg: #181818;
+      --tab-bg: #2d2d2d;
+      --tab-active-bg: #1e1e1e;
+      --tab-border: #252526;
+      --line-number: #6e7681;
+      --status-bar-bg: #007acc;
+      --status-bar-fg: #ffffff;
+      --border: #3e3e42;
+      --selection: #264f78;
+      --gutter-bg: #1e1e1e;
+      --kw: #569cd6;
+      --str: #ce9178;
+      --cmt: #6a9955;
+      --fn: #dcdcaa;
+      --type: #4ec9b0;
+      --num: #b5cea8;
+      --tag: #569cd6;
+      --attr: #9cdcfe;
+      --op: #d4d4d4;
+      --var: #d4d4d4;
+      --hover-bg: #2a2d2e;
+      --eliminated: #6a737d;
+      --selected-bg: #264f78;
+      --selected-fg: #ffffff;
+      --error: #f14c4c;
+      --hint-bg: rgba(77, 171, 247, 0.25);
+    }
+
+    :root.light {
+      --bg: #ffffff;
+      --fg: #333333;
+      --sidebar-bg: #f3f3f3;
+      --activity-bar-bg: #f3f3f3;
+      --tab-bg: #ececec;
+      --tab-active-bg: #ffffff;
+      --tab-border: #e5e5e5;
+      --line-number: #237893;
+      --status-bar-bg: #007acc;
+      --status-bar-fg: #ffffff;
+      --border: #e5e5e5;
+      --selection: #add6ff;
+      --gutter-bg: #ffffff;
+      --kw: #0000ff;
+      --str: #a31515;
+      --cmt: #008000;
+      --fn: #795e26;
+      --type: #267f99;
+      --num: #098658;
+      --tag: #0000ff;
+      --attr: #e50000;
+      --op: #000000;
+      --var: #333333;
+      --hover-bg: #e8e8e8;
+      --eliminated: #6a737d;
+      --selected-bg: #add6ff;
+      --selected-fg: #000000;
+      --error: #f14c4c;
+      --hint-bg: rgba(0, 123, 255, 0.15);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: var(--vscode-font-family, 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace);
+      font-size: var(--vscode-font-size, 14px);
+      line-height: 1.6;
+      background: var(--bg); color: var(--fg);
+      letter-spacing: 0.3px;
+    }
+
+    .vscode-window { display: flex; flex-direction: column; width: 100%; height: 100%; }
+
+    .editor-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; min-height: 0; }
+
+    .tabs { display: flex; height: 35px; background: var(--tab-bg); border-bottom: 1px solid var(--border); overflow-x: hidden; }
+    .tab { display: flex; align-items: center; padding: 0 12px; min-width: 120px; max-width: 220px; background: var(--tab-bg); border-right: 1px solid var(--tab-border); font-size: 12px; cursor: pointer; white-space: nowrap; gap: 6px; color: var(--fg); opacity: 0.8; transition: background 0.1s ease; }
+    .tab:hover { background: var(--hover-bg); }
+    .tab.active { background: var(--tab-active-bg); opacity: 1; border-top: 1px solid var(--status-bar-bg); }
+    .tab-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px; border-radius: 3px; color: #fff; font-weight: bold; }
+    .tab-icon.vue { background: #42b883; }
+    .tab-modified { font-size: 8px; color: var(--fg); opacity: 0.6; margin-left: 4px; }
+    .tab-close { margin-left: auto; font-size: 14px; opacity: 0; transition: opacity 0.1s; }
+    .tab:hover .tab-close { opacity: 0.5; }
+    .tab-close:hover { opacity: 1; }
+
+    .breadcrumb { height: 22px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: var(--fg); opacity: 0.7; background: var(--tab-active-bg); border-bottom: 1px solid var(--border); gap: 6px; }
+    .breadcrumb span { cursor: default; }
+    .breadcrumb .sep { opacity: 0.4; }
+
+    .editor-body { flex: 1; display: flex; overflow: hidden; position: relative; min-height: 0; }
+
+    .line-numbers { width: 52px; flex-shrink: 0; background: var(--gutter-bg); color: var(--line-number); text-align: right; padding: 12px 10px 0 0; font-size: var(--vscode-font-size, 14px); line-height: 1.6; user-select: none; overflow: hidden; font-family: inherit; }
+
+    .code-content { flex: 1; overflow: auto; padding: 0; position: relative; min-width: 0; }
+    /* VS Code-style thin scrollbar */
+    .code-content::-webkit-scrollbar { width: 10px; height: 10px; }
+    .code-content::-webkit-scrollbar-track { background: transparent; }
+    .code-content::-webkit-scrollbar-thumb { background: rgba(121, 121, 121, 0.4); border-radius: 0; border: 2px solid transparent; background-clip: content-box; }
+    .code-content::-webkit-scrollbar-thumb:hover { background: rgba(121, 121, 121, 0.7); border: 2px solid transparent; background-clip: content-box; }
+    .code-content::-webkit-scrollbar-corner { background: transparent; }
+
+    .code-file { padding: 12px 0 0 16px; font-size: var(--vscode-font-size, 14px); line-height: 1.6; font-family: inherit; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    .code-line { white-space: pre; padding: 0 12px 0 0; min-height: 1.6em; display: flex; }
+    .code-line:hover { background: rgba(128,128,128,0.04); }
+    /* Active line highlight (subtle, like VS Code) */
+    .code-line.active-line { background: rgba(255,255,255,0.03); } /* dark */
+    :root.light .code-line.active-line { background: rgba(0,0,0,0.03); }
+
+    .keyword {
+      cursor: pointer;
+      border-radius: 2px;
+      padding: 1px 2px;
+      margin: -1px -2px;
+      transition: background 0.1s ease;
+      position: relative;
+    }
+    .keyword:hover { background: rgba(255,255,255,0.12); }
+    :root.light .keyword:hover { background: rgba(0,0,0,0.08); }
+
+    .keyword.selected {
+      background: var(--selected-bg) !important;
+      color: var(--selected-fg) !important;
+    }
+    .keyword.eliminated {
+      color: var(--eliminated) !important;
+      text-decoration: line-through !important;
+      opacity: 0.6;
+      cursor: default;
+      pointer-events: none;
+    }
+    .keyword.error {
+      border-bottom: 2px solid var(--error);
+      animation: shake 0.3s ease;
+    }
+    .keyword.hint {
+      background: var(--hint-bg) !important;
+      border-radius: 3px;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-3px); }
+      40% { transform: translateX(3px); }
+      60% { transform: translateX(-2px); }
+      80% { transform: translateX(2px); }
+    }
+
+    @keyframes flash-green {
+      0% { background: transparent; }
+      30% { background: rgba(39, 201, 63, 0.3); }
+      100% { background: transparent; }
+    }
+    .keyword.flash-ok { animation: flash-green 0.4s ease; }
+
+    .mask-page { position: absolute; inset: 0; background: var(--bg); z-index: 10; display: none; flex-direction: row; }
+    .mask-page.active { display: flex; }
+    .mask-page .mask-content { flex: 1; padding: 12px 0 0 0; white-space: pre; font-size: var(--vscode-font-size, 14px); line-height: inherit; overflow: auto; color: var(--fg); font-family: inherit; }
+    .mask-page .line-numbers { padding-top: 12px; }
+
+
+    /* Status bar items look like VS Code native */
+    .status-bar { height: 22px; background: var(--status-bar-bg); color: var(--status-bar-fg); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 12px; user-select: none; }
+    .status-item { cursor: default; transition: background 0.1s; padding: 0 4px; }
+    .status-item.clickable { cursor: pointer; }
+    .status-item.clickable:hover { background: rgba(255,255,255,0.12); }
+    :root.light .status-item.clickable:hover { background: rgba(0,0,0,0.08); }
+    .status-bar-left, .status-bar-right { display: flex; gap: 2px; align-items: center; }
+
+    /* Combo flash in status bar */
+    @keyframes combo-flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; color: #4ec9b0; }
+    }
+    .combo-badge { display: none; font-weight: 600; }
+    .combo-badge.active { display: inline; animation: combo-flash 0.6s ease 2; }
+
+    .kw { color: var(--kw); } .str { color: var(--str); } .cmt { color: var(--cmt); }
+    .fn { color: var(--fn); } .type { color: var(--type); } .num { color: var(--num); }
+    .tag { color: var(--tag); } .attr { color: var(--attr); } .op { color: var(--op); } .var { color: var(--var); }
+    .punct { color: var(--fg); opacity: 0.7; }
+    .mustache { color: #dcdcaa; }
+    .css-prop { color: #9cdcfe; }
+    .css-val { color: #ce9178; }
+    .css-sel { color: #d7ba7d; }
+    .tag-delimiter { color: #808080; }
+
+    .toast { position: fixed; bottom: 30px; right: 16px; background: var(--tab-bg); color: var(--fg); padding: 6px 12px; border-radius: 3px; font-size: 12px; z-index: 100; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; border: 1px solid var(--border); }
+    .toast.show { opacity: 0.85; }
+
+    .victory-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .victory-overlay.active { display: flex; }
+    .victory-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 32px 48px; text-align: center; }
+    .victory-card h2 { margin: 0 0 8px 0; color: #27c93f; }
+    .victory-card p { margin: 0; color: var(--fg); opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div class="vscode-window">
+    <div class="editor-area">
+        <div class="tabs" id="tabs">
+          <div class="tab active"><span class="tab-icon vue">V</span><span>AuditTimeline.vue</span><span class="tab-modified">&#9679;</span><span class="tab-close">&#215;</span></div>
+        </div>
+        <div class="breadcrumb">
+          <span>graziery</span><span class="sep">/</span><span>src</span><span class="sep">/</span><span>views</span><span class="sep">/</span><span>taskAudit</span><span class="sep">/</span><span style="opacity:1;">AuditTimeline.vue</span>
+        </div>
+        <div class="editor-body">
+          <div class="line-numbers" id="line-numbers"></div>
+          <div class="code-content" id="code-content">
+            <div class="code-file" id="code-file"></div>
+          </div>
+          <div class="mask-page" id="mask-page">
+            <div class="line-numbers" id="mask-line-numbers"></div>
+            <div class="mask-content" id="mask-content"></div>
+          </div>
+        </div>
+        <div class="status-bar">
+          <div class="status-bar-left">
+            <span class="status-item" id="git-branch" title="Git branch: main (decorative)">&#9654; main</span>
+            <span class="status-item" id="code-issues" title="Remaining duplicate pairs to eliminate">&#10007; 8</span>
+            <span class="status-item clickable" id="hint-btn" title="Find next duplicate pair">&#128269;</span>
+            <span class="status-item clickable" id="lang-label" title="Switch level: click to change file (Vue / Java / TS)">Vue</span>
+            <span class="combo-badge" id="combo-text"></span>
+          </div>
+          <div class="status-bar-right">
+            <span id="position-text" title="Cursor position">Ln 1, Col 1</span><span title="File encoding">UTF-8</span><span title="Indentation">Spaces: 2</span><span id="reset-btn" class="status-item clickable" title="Reload current level">&#8635;</span>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="victory-overlay" id="victory-overlay">
+    <div class="victory-card">
+      <h2>Review Complete!</h2>
+      <p id="victory-score">Score: 0</p>
+      <p id="victory-time">Time: 0:00</p>
+      <p style="margin-top:16px;opacity:0.6;font-size:12px;">All duplicates eliminated. Code refactored.</p>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    // ========== 1. Multi-Level System ==========
+    // Levels defined in section 4 below, referenced via getCurrentLevel()
+
+    // ========== 2. Game State ==========
+    let selectedKeyword = null;
+    let pairsLeft = 0; // set by currentLevel
+    let score = 0;
+    let combo = 0;
+    let lock = false;
+    let isMaskActive = false;
+    let startTime = Date.now();
+    let keywordElements = [];
+    let pairMap = {};
+    let currentLevelIdx = 0;
+
+    const codeFile = document.getElementById('code-file');
+    const lineNumbers = document.getElementById('line-numbers');
+    const codeIssues = document.getElementById('code-issues');
+    const comboText = document.getElementById('combo-text');
+    const positionText = document.getElementById('position-text');
+    const toast = document.getElementById('toast');
+    const victoryOverlay = document.getElementById('victory-overlay');
+    const maskPage = document.getElementById('mask-page');
+    const maskContent = document.getElementById('mask-content');
+    const maskLineNumbers = document.getElementById('mask-line-numbers');
+    const tabLabel = document.querySelector('.tab span:nth-child(2)');
+    const tabIcon = document.querySelector('.tab-icon');
+
+    // ========== 3. Syntax Highlighting (VS Code Dark+ compatible) ==========
+    function escHtml(t) {
+      return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // JS/TS keywords
+    const JS_KW = new Set(['import','from','export','default','const','let','var','function','return',
+      'if','else','for','while','do','switch','case','break','continue','class','extends','new',
+      'async','await','true','false','null','undefined','this','typeof','instanceof','in','of',
+      'try','catch','finally','throw','delete','void','with','debugger','as','yield','super',
+      'get','set','static','typeof','enum','implements','interface','type','namespace','module',
+      'declare','abstract','readonly','public','private','protected','keyof']);
+    const VUE_KW = new Set(['ref','reactive','computed','watch','onMounted','onUnmounted',
+      'onCreated','defineProps','defineEmits','defineExpose','defineOptions','useDict',
+      'toRefs','nextTick','provide','inject','watchEffect','toRef','shallowRef']);
+
+    // Current SFC block tracking
+    let currentBlock = 'template'; // 'template' | 'script' | 'style'
+
+    function resetBlockState(lineIdx) {
+      if (lineIdx < 23) currentBlock = 'template';
+      else if (lineIdx < 50) currentBlock = 'script';
+      else currentBlock = 'style';
+    }
+
+    function highlightLine(line, lineIdx) {
+      resetBlockState(lineIdx);
+      if (currentBlock === 'template') return highlightTemplate(line);
+      if (currentBlock === 'script') return highlightJS(line);
+      return highlightCSS(line);
+    }
+
+    function highlightTemplate(line) {
+      let html = '';
+      let i = 0;
+      while (i < line.length) {
+        // Mustache expression {{ ... }}
+        if (line.substr(i, 2) === '{{' || line.substr(i, 2) === '{') {
+          let closeIdx = line.indexOf('}}', i + 2);
+          if (closeIdx < 0) { html += escHtml(line[i]); i++; continue; }
+          html += '<span class="tag-delimiter">{{</span>';
+          html += highlightJS(line.substring(i + 2, closeIdx), true);
+          html += '<span class="tag-delimiter">}}</span>';
+          i = closeIdx + 2;
+          continue;
+        }
+        // v- directives as attributes
+        if (i === 0 && /^\s*v-/.test(line)) {
+          // Handle directive line
+          let j = i;
+          while (j < line.length && /\S/.test(line[j])) j++;
+          const word = line.substring(i, j).trim();
+          if (/^v-|:|@|#/.test(word)) {
+            html += '<span class="attr">' + escHtml(word) + '</span>';
+            i = j;
+            continue;
+          }
+        }
+        // HTML comment
+        if (line.substr(i, 4) === '<!--') {
+          let end = line.indexOf('-->', i + 4);
+          if (end < 0) end = line.length; else end += 3;
+          html += '<span class="cmt">' + escHtml(line.substring(i, end)) + '</span>';
+          i = end; continue;
+        }
+        // HTML tag open/close
+        if (line[i] === '<') {
+          let isClose = false;
+          let j = i + 1;
+          if (line[j] === '/') { isClose = true; j++; }
+          // Read tag name
+          let tagName = '';
+          while (j < line.length && /[a-zA-Z]/.test(line[j])) { tagName += line[j]; j++; }
+          if (tagName) {
+            // Tag delimiter + name
+            html += '<span class="tag-delimiter">&lt;' + (isClose ? '/' : '') + '</span>';
+            html += '<span class="tag">' + escHtml(tagName) + '</span>';
+            i = j;
+
+            // Now parse attributes until >
+            while (i < line.length && line[i] !== '>' && line[i] !== '/' && line[i] <= ' ') i++;
+
+            // Parse attributes: name="value" or :name=value or @event=handler
+            while (i < line.length && line[i] !== '>' && line[i] !== '/') {
+              // skip whitespace
+              while (i < line.length && (line[i] === ' ' || line[i] === '\t')) {
+                html += escHtml(line[i]); i++;
+              }
+              if (i >= line.length || line[i] === '>' || line[i] === '/') break;
+
+              // Attribute name (may start with :, @, #, v-)
+              let attrName = '';
+              if (/:|@|#|v-/.test(line[i])) attrName += line[i++];
+
+              while (i < line.length && /[a-zA-Z_\-][a-zA-Z0-9_\-\.]*/.test(line.substr(i, Math.min(20, line.length - i)))) {
+                attrName += line[i]; i++;
+              }
+
+              if (attrName) {
+                html += ' ';
+                html += '<span class="attr">' + escHtml(attrName) + '</span>';
+
+                // Skip whitespace to =
+                while (i < line.length && line[i] === ' ') { html += escHtml(line[i]); i++; }
+
+                // =
+                if (i < line.length && line[i] === '=') {
+                  html += '<span class="punct">=</span>'; i++;
+                  // skip ws
+                  while (i < line.length && line[i] === ' ') { html += escHtml(line[i]); i++; }
+                  // Attribute value (quoted)
+                  if (i < line.length && (line[i] === '"' || line[i] === "'" || line[i] === '`')) {
+                    const q = line[i];
+                    let valStart = i + 1;
+                    let valEnd = valStart;
+                    while (valEnd < line.length && line[valEnd] !== q) { if (line[valEnd] === '\\') valEnd++; valEnd++; }
+                    // Check if attribute value looks like JS (contains {{ }} or is binding)
+                    const rawVal = line.substring(valStart, valEnd);
+
+                    html += '<span class="tag-delimiter">' + escHtml(q) + '</span>';
+
+                    // If it's a bound attribute with possible JS inside, highlight inner content
+                    if (rawVal.includes('{{')) {
+                      // Split by {{ }}
+                        let vi = 0;
+                        while (vi < rawVal.length) {
+                          if (rawVal.substr(vi, 2) === '{{') {
+                            let vc = rawVal.indexOf('}}', vi + 2);
+                            if (vc < 0) { html += escHtml(rawVal[vi]); vi++; continue; }
+                            html += escHtml(rawVal.substring(vi, vi + 2));
+                            html += highlightJS(rawVal.substring(vi + 2, vc), true);
+                            html += '}}';
+                            vi = vc + 2;
+                          } else {
+                            html += escHtml(rawVal[vi]); vi++;
+                          }
+                        }
+                      } else if (attrName.startsWith(':') || attrName.startsWith('@') || attrName.startsWith('v-')) {
+                        // Dynamic binding - treat as JS
+                        html += '<span class="str">' + escHtml(rawVal) + '</span>';
+                      } else {
+                        html += '<span class="str">' + escHtml(rawVal) + '</span>';
+                      }
+                    html += '<span class="tag-delimiter">' + escHtml(q) + '</span>';
+                    i = valEnd + 1;
+                  } else {
+                    // unquoted value
+                    let valStart = i;
+                    while (i < line.length && /[^\s>\/]/.test(line[i])) i++;
+                    if (i > valStart) html += '<span class="str">' + escHtml(line.substring(valStart, i)) + '</span>';
+                  }
+                }
+              } else {
+                html += escHtml(line[i]); i++;
+              }
+            }
+            // Closing >
+            if (i < line.length && (line[i] === '>' || line[i] === '/')) {
+              if (line[i] === '/') { html += '<span class="tag-delimiter">/</span>'; i++; }
+              if (i < line.length && line[i] === '>') { html += '<span class="tag-delimiter">&gt;</span>'; i++; }
+            }
+            continue;
+          }
+          // Not a tag, just output <
+          html += '&lt;'; i++;
+          continue;
+        }
+        // Plain text content (indentation etc)
+        html += escHtml(line[i]);
+        i++;
+      }
+      return html;
+    }
+
+    function highlightJS(line, isInline) {
+      let html = '';
+      let i = 0;
+      while (i < line.length) {
+        // Single-line comment
+        if (!isInline && line.substr(i, 2) === '//') {
+          html += '<span class="cmt">' + escHtml(line.substr(i)) + '</span>';
+          break;
+        }
+        // Block comment start
+        if (line.substr(i, 2) === '/*') {
+          let j = line.indexOf('*/', i + 2);
+          if (j < 0) j = line.length; else j += 2;
+          html += '<span class="cmt">' + escHtml(line.substring(i, j)) + '</span>';
+          i = j; continue;
+        }
+        // String literals
+        if (line[i] === '"' || line[i] === "'" || line[i] === '`') {
+          const q = line[i];
+          let j = i + 1;
+          // For backtick strings (template literals), handle ${} expressions
+          if (q === '`') {
+            let strContent = '';
+            while (j < line.length && line[j] !== '`') {
+              if (line[j] === '\\') { strContent += line[j] + (line[j+1] || ''); j += 2; continue; }
+              if (line.substr(j, 2) === '${') {
+                // Find matching }
+                let depth = 1;
+                let k = j + 2;
+                while (k < line.length && depth > 0) {
+                  if (line[k] === '{') depth++;
+                  else if (line[k] === '}') depth--;
+                  if (depth > 0) k++;
+                }
+                strContent += '${';
+                strContent += highlightJS(line.substring(j + 2, k), true);
+                strContent += '}';
+                j = k;
+              } else {
+                strContent += line[j];
+                j++;
+              }
+            }
+            if (j < line.length) j++; // closing `
+            html += '<span class="str">`' + strContent + '`</span>';
+          } else {
+            while (j < line.length && line[j] !== q) { if (line[j] === '\\') j++; j++; }
+            html += '<span class="str">' + escHtml(line.substring(i, j + (j < line.length ? 1 : 0))) + '</span>';
+            if (j < line.length) j++;
+          }
+          i = j; continue;
+        }
+        // Regex literal
+        if (!isInline && line[i] === '/' && i > 0 && /[\s(=[,!?:]$/.test(line[i - 1] || ' ')) {
+          let j = i + 1;
+          while (j < line.length && line[j] !== '/') { if (line[j] === '\\') j++; j++; }
+          if (j < line.length) {
+            j++; // include flags
+            while (j < line.length && /[gimsuy]/.test(line[j])) j++;
+            html += '<span class="str">' + escHtml(line.substring(i, j)) + '</span>';
+            i = j; continue;
+          }
+        }
+        // Numbers (including .5, 0x, 1e3, etc.)
+        if (/[0-9]/.test(line[i]) || (line[i] === '.' && i + 1 < line.length && /[0-9]/.test(line[i + 1]))) {
+          let j = i;
+          if (line[j] === '0' && (line[j+1] === 'x' || line[j+1] === 'X')) {
+            j += 2; while (j < line.length && /[0-9a-fA-F]/.test(line[j])) j++;
+          } else if (line[j] === '0' && (line[j+1] === 'b' || line[j+1] === 'B')) {
+            j += 2; while (j < line.length && /[01]/.test(line[j])) j++;
+          } else {
+            while (j < line.length && /[0-9]/.test(line[j])) j++;
+            if (j < line.length && line[j] === '.') { j++; while (j < line.length && /[0-9]/.test(line[j])) j++; }
+            if (j < line.length && /[eE]/.test(line[j])) { j++; if (j < line.length && /[+-]/.test(line[j])) j++; while (j < line.length && /[0-9]/.test(line[j])) j++; }
+          }
+          html += '<span class="num">' + escHtml(line.substring(i, j)) + '</span>';
+          i = j; continue;
+        }
+        // Identifiers and keywords
+        if (/[a-zA-Z_$@]/.test(line[i])) {
+          let word = '', j = i;
+          while (j < line.length && /[a-zA-Z0-9_$]/.test(line[j])) { word += line[j]; j++; }
+
+          // Check for keyword
+          if (JS_KW.has(word)) html += '<span class="kw">' + escHtml(word) + '</span>';
+          else if (VUE_KW.has(word)) html += '<span class="fn">' + escHtml(word) + '</span>';
+          else if (/^[A-Z]/.test(word) && word.length > 1) html += '<span class="type">' + escHtml(word) + '</span>';
+          else {
+            // Check if followed by ( → function call
+            let k = j;
+            while (k < line.length && line[k] === ' ') k++;
+            if (k < line.length && line[k] === '(') html += '<span class="fn">' + escHtml(word) + '</span>';
+            else html += '<span class="var">' + escHtml(word) + '</span>';
+          }
+          i = j; continue;
+        }
+        // Punctuation that's worth highlighting
+        if ('{}[](),.:;'.includes(line[i])) {
+          html += '<span class="punct">' + escHtml(line[i]) + '</span>';
+        } else {
+          html += escHtml(line[i]);
+        }
+        i++;
+      }
+      return html;
+    }
+
+    function highlightCSS(line) {
+      let trimmed = line.trim();
+
+      // CSS comment
+      if (trimmed.startsWith('/*') || trimmed.startsWith('*')) {
+        if (trimmed.endsWith('*/') || trimmed.endsWith('*')) {
+          return '<span class="cmt">' + escHtml(line) + '</span>';
+        }
+      }
+      if (trimmed.startsWith('//')) {
+        return '<span class="cmt">' + escHtml(line) + '</span>';
+      }
+      // Empty line or only whitespace
+      if (!trimmed) return escHtml(line);
+
+      // CSS selector line (starts with ., #, [, letter, : or })
+      if (/^[.#\[\w:@>-]/.test(trimmed) && !trimmed.includes(':') || /^[\.\#\[\w]/.test(trimmed)) {
+        // Could be selector or property
+        let colonIdx = trimmed.indexOf(':');
+        if (colonIdx > 0 && !trimmed.startsWith('@') && !trimmed.startsWith('/*')) {
+          // Check if it looks like property: value (no space before :)
+          const beforeColon = trimmed.substring(0, colonIdx);
+          if (!beforeColon.includes('(') && !beforeColon.includes('{')) {
+            // It's a property: value line
+            let html = '';
+            let i = 0;
+            while (i < line.length && line[i] === ' ') { html += escHtml(line[i]); i++; }
+            let propName = '';
+            while (i < line.length && line[i] !== ':') { propName += line[i]; i++; }
+            html += '<span class="css-prop">' + escHtml(propName) + '</span>';
+            if (i < line.length) { html += '<span class="punct">:</span>'; i++; }
+            while (i < line.length && line[i] === ' ') { html += escHtml(line[i]); i++; }
+            // Value
+            let valStr = line.substring(i).trim();
+            // Color values
+            if (/^(#[0-9a-fA-F]{3,8}|rgba?|hsla?)/.test(valStr)) {
+              html += '<span class="num" style="color:' + (valStr.startsWith('#') ? valStr : 'var(--num)') + '">' + escHtml(valStr) + '</span>';
+            } else if (/^(\d+\.?\d*)(px|em|rem|%|vh|vw|s|ms|deg)?$/.test(valStr)) {
+              html += '<span class="num">' + escHtml(valStr) + '</span>';
+            } else {
+              html += '<span class="css-val">' + escHtml(valStr) + '</span>';
+            }
+            return html;
+          }
+        }
+      }
+
+      // Selector line
+      if (trimmed.startsWith('.') || trimmed.startsWith('#') || trimmed.startsWith('&') || /^[a-z]/i.test(trimmed)) {
+        let html = '';
+        let i = 0;
+        // Preserve indentation
+        while (i < line.length && line[i] === ' ') { html += escHtml(line[i]); i++; }
+        let sel = '';
+        while (i < line.length && line[i] !== '{' && line[i] !== ',') { sel += line[i]; i++; }
+        html += '<span class="css-sel">' + escHtml(sel) + '</span>';
+        if (i < line.length) {
+          if (line[i] === ',') { html += '<span class="punct">,</span>'; i++; }
+          if (line[i] === '{') { html += '<span class="punct">{</span>'; i++; }
+          html += escHtml(line.substring(i));
+        }
+        return html;
+      }
+
+      // Fallback: just escape
+      return escHtml(line);
+    }
+
+    // Java syntax highlighter
+    const JAVA_KW = new Set(['public','private','protected','class','interface','extends','implements',
+      'import','package','static','final','void','int','long','double','float','boolean','char',
+      'byte','short','new','return','if','else','for','while','do','switch','case','break',
+      'continue','default','try','catch','finally','throw','throws','this','super','null',
+      'true','false','instanceof','enum','abstract','synchronized','volatile','transient','assert']);
+    const JAVA_ANNOTATION_PREFIX = '@';
+    const JAVA_TYPES = new Set(['String','List','Map','Set','Object','Integer','Long','Double',
+      'Float','Boolean','Character','Void','ResponseEntity','HttpServletRequest',
+      'HttpServletResponse','PathVariable','RequestBody','RequestParam','Autowired',
+      'RestController','Controller','Service','Repository','Component','Configuration',
+      'Bean','Value','RequestMapping','GetMapping','PostMapping','PutMapping',
+      'DeleteMapping','PatchMapping','PreAuthorize','Log','BaseController','AjaxResult',
+      'TableDataInfo','PageHelper','BusinessType','ExcelUtil','StringUtils','TokenService']);
+
+    function highlightJava(line) {
+      let html = '';
+      let i = 0;
+      while (i < line.length) {
+        // Single-line comment
+        if (line.substr(i, 2) === '//') {
+          html += '<span class="cmt">' + escHtml(line.substr(i)) + '</span>';
+          break;
+        }
+        // Javadoc / block comment
+        if (line.substr(i, 2) === '/*' || line.substr(i, 2) === '* ') {
+          let j = i;
+          if (line[i] === '/' && line[i+1] === '*') {
+            j = line.indexOf('*/', i + 2);
+            if (j < 0) j = line.length; else j += 2;
+          } else {
+            // * in javadoc
+            j = line.length; // treat rest of line as comment
+          }
+          html += '<span class="cmt">' + escHtml(line.substring(i, j)) + '</span>';
+          i = j; continue;
+        }
+        // Annotation (@PreAuthorize, @Autowired, etc.)
+        if (line[i] === JAVA_ANNOTATION_PREFIX) {
+          let ann = '';
+          let j = i + 1;
+          while (j < line.length && /[a-zA-Z0-9_.]/.test(line[j])) { ann += line[j]; j++; }
+          if (ann && !JAVA_TYPES.has(ann)) {
+            html += '<span class="fn" style="color:#d4d4d4;">@</span><span class="type">' + escHtml(ann) + '</span>';
+          } else {
+            html += '<span class="type">@' + escHtml(ann) + '</span>';
+          }
+          i = j; continue;
+        }
+        // String literals
+        if (line[i] === '"') {
+          let j = i + 1;
+          while (j < line.length && line[j] !== '"') { if (line[j] === '\\') j++; j++; }
+          html += '<span class="str">"' + escHtml(line.substring(i+1, j)) + '"</span>';
+          i = j + 1; continue;
+        }
+        // Char literals
+        if (line[i] === "'") {
+          let j = i + 1;
+          while (j < line.length && line[j] !== "'") { if (line[j] === '\\') j++; j++; }
+          if (j < line.length) j++;
+          html += '<span class="num">' + escHtml(line.substring(i, j)) + '</span>';
+          i = j; continue;
+        }
+        // Numbers
+        if (/[0-9]/.test(line[i]) || (line[i] === '.' && i+1 < line.length && /[0-9]/.test(line[i+1]))) {
+          let j = i;
+          if (line[j] === '0' && (line[j+1] === 'x' || line[j+1] === 'X')) {
+            j += 2; while (j < line.length && /[0-9a-fA-F]/.test(line[j])) j++;
+          } else {
+            while (j < line.length && /[0-9]/.test(line[j])) j++;
+            if (j < line.length && line[j] === '.') { j++; while (j < line.length && /[0-9]/.test(line[j])) j++; }
+            if (j < line.length && /[eELfFdD]/.test(line[j])) { j++; if (j < line.length && /[+-]/.test(line[j])) j++; while (j < line.length && /[0-9]/.test(line[j])) j++; }
+          }
+          // Check for L/l/F/f/D/d suffix
+          if (j > i) html += '<span class="num">' + escHtml(line.substring(i, j)) + '</span>';
+          else { html += escHtml(line[i]); i++; continue; }
+          i = j; continue;
+        }
+        // Identifiers / keywords
+        if (/[a-zA-Z_$]/.test(line[i])) {
+          let word = '', j = i;
+          while (j < line.length && /[a-zA-Z0-9_$<>.,[\]]/.test(line[j])) { word += line[j]; j++; }
+
+          // Generic types like List<>, Map<,> - handle the <> part separately
+          if (word.includes('<')) {
+            let baseWord = word.split('<')[0];
+            let rest = word.substring(baseWord.length);
+            if (JAVA_KW.has(baseWord)) html += '<span class="kw">' + escHtml(baseWord) + '</span>';
+            else if (JAVA_TYPES.has(baseWord)) html += '<span class="type">' + escHtml(baseWord) + '</span>';
+            else if (/^[A-Z]/.test(baseWord) && baseWord.length > 1) html += '<span class="type">' + escHtml(baseWord) + '</span>';
+            else html += '<span class="var">' + escHtml(baseWord) + '</span>';
+            // Highlight generic params
+            let gi = 0;
+            while (gi < rest.length) {
+              if ('<>,'.includes(rest[gi])) { html += '<span class="punct">' + escHtml(rest[gi]) + '</span>'; gi++; }
+              else if (/[A-Z]/.test(rest[gi]) && /[a-zA-Z0-9_$]/.test(rest[gi])) {
+                let gw = '';
+                while (gi < rest.length && /[a-zA-Z0-9_$]/.test(rest[gi])) { gw += rest[gi]; gi++; }
+                html += '<span class="type">' + escHtml(gw) + '</span>';
+              } else if (rest[gi] === '?') {
+                html += '<span class="kw">?</span>'; gi++;
+              } else { html += escHtml(rest[gi]); gi++; }
+            }
+            i = j; continue;
+          }
+
+          if (JAVA_KW.has(word)) html += '<span class="kw">' + escHtml(word) + '</span>';
+          else if (JAVA_TYPES.has(word)) html += '<span class="type">' + escHtml(word) + '</span>';
+          else if (/^[A-Z]/.test(word) && word.length > 1) html += '<span class="type">' + escHtml(word) + '</span>';
+          else {
+            // Check if followed by ( → method call
+            let k = j;
+            while (k < line.length && line[k] === ' ') k++;
+            if (k < line.length && line[k] === '(') html += '<span class="fn">' + escHtml(word) + '</span>';
+            else html += '<span class="var">' + escHtml(word) + '</span>';
+          }
+          i = j; continue;
+        }
+        // Punctuation
+        if ('{}[](),.:;'.includes(line[i])) {
+          html += '<span class="punct">' + escHtml(line[i]) + '</span>';
+        } else {
+          html += escHtml(line[i]);
+        }
+        i++;
+      }
+      return html;
+    }
+
+    // ========== 4. Multi-Level System ==========
+    const LEVELS = [
+      // Level 1: Vue SFC — AuditTimeline.vue (existing)
+      {
+        id: 1,
+        name: 'AuditTimeline.vue',
+        lang: 'Vue',
+        langMode: 'vue',   // 'vue' | 'java' | 'js'
+        breadcrumb: ['graziery', 'src', 'views', 'taskAudit', 'AuditTimeline.vue'],
+        code: `<template>
+    <div class="detail-audit-opinion">
+        <div class="audit-opinion-title">
+            <img :src="getImage('/icon_baseline.svg')" alt="" style="margin-right: 8px;"></img>
+            <span>审核意见</span>
+        </div>
+        <div class="audit-opinion-content">
+            <el-timeline>
+                <el-timeline-item v-for="(item, index) in auditList" :key="index"
+                    :type="item.status === 'approved' ? 'primary' : 'danger'"
+                    :color="item.status === 'approved' ? '#409EFF' : '#F56C6C'" :hollow="true" :timestamp="item.date"
+                    placement="bottom">
+                    <div class="timeline-content">
+                        <span class="status-text">{{ item.title }}</span>
+                        <div v-if="item.reason" class="reason-text">{{ item.reason }}</div>
+                    </div>
+                </el-timeline-item>
+            </el-timeline>
+            <div class="input-area">
+                <el-input v-model="auditOpinion" spellcheck="false" type="textarea" :rows="3" placeholder="请输入审核意见（选填）"
+                    class="opinion-input" />
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { computed, ref, defineOptions, defineExpose } from 'vue';
+import { useDict } from '@/store/dict';
+import { getImage, getLabel } from '@/utils/utils.js';
+import { getAuditLogByUuid } from '@/api/taskList';
+
+const { biz_audit_log } = useDict('biz_audit_log');
+
+defineOptions({
+    name: 'AuditTimeline'
+});
+
+const props = defineProps({
+    modelValue: {
+        type: String,
+        default: ''
+    }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const auditOpinion = computed({
+    get: () => props.modelValue,
+    set: (val) => emit('update:modelValue', val)
+});
+
+const auditList = ref([]);
+
+const fetchAuditLog = (uuid) => {
+    if (!uuid) {
+        console.warn('缺少 uuid，无法获取审核日志');
+        auditList.value = [];
+        return;
+    }
+
+    getAuditLogByUuid(uuid).then(res => {
+        if (res.code === 200) {
+            auditList.value = formatAuditLog(res.rows);
+        } else {
+            console.warn('获取审核日志失败:', res.msg);
+            auditList.value = [];
+        }
+    }).catch(err => {
+        console.error('获取审核日志异常:', err);
+        auditList.value = [];
+    });
+};
+
+const formatAuditLog = (data) => {
+    if (!data || !Array.isArray(data)) return [];
+
+    return data.map(log => {
+        const stateLabel = getLabel(log.state, biz_audit_log.value);
+        const isApproved = log.state === 3;
+        const isRejected = log.state === 2;
+
+        return {
+            status: isApproved ? 'approved' : (isRejected ? 'rejected' : 'pending'),
+            title: \`\${log.nickName || '未知用户'} 核审 \${stateLabel || '状态未知'} (\${log.roleName || '角色未知'})\`,
+            reason: log.desc || '',
+            date: log.createTime || '',
+            auditor: log.nickName || log.createBy || '',
+            state: log.state
+        };
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+};
+
+defineExpose({ fetchAuditLog });
+<\x2fscript>
+
+<style lang="less" scoped>
+.detail-audit-opinion {
+    margin-bottom: 16px;
+    .audit-opinion-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        font-size: 16px;
+        font-weight: 500;
+        color: rgba(2, 9, 23, 1);
+    }
+    .audit-opinion-content {
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: 4px;
+    }
+    .timeline-content { display: flex; flex-direction: column; }
+    .status-text { font-size: 14px; font-weight: 500; }
+    .reason-text { font-size: 13px; color: #909399; margin-top: 4px; }
+    .input-area { margin-top: 10px; }
+    .opinion-input { width: 100%; }
+}
+<\/style>`,
+        pairs: [
+          { id: 1, keyword: '<template>', display: '&lt;template&gt;' },
+          { id: 2, keyword: '</template>', display: '&lt;/template&gt;' },
+          { id: 3, keyword: '<el-timeline>', display: '&lt;el-timeline&gt;' },
+          { id: 4, keyword: '</el-timeline>', display: '&lt;/el-timeline&gt;' },
+          { id: 5, keyword: '<el-timeline-item>', display: '&lt;el-timeline-item&gt;' },
+          { id: 6, keyword: '</el-timeline-item>', display: '&lt;/el-timeline-item&gt;' },
+          { id: 7, keyword: '<el-input>', display: '&lt;el-input&gt;' },
+          { id: 8, keyword: '</el-input>', display: '&lt;/el-input&gt;' }
+        ],
+        originalPositions: [
+          { pairId: 1, lineIdx: 0, col: 0, text: '<template>' },
+          { pairId: 2, lineIdx: 22, col: 0, text: '</template>' },
+          { pairId: 3, lineIdx: 6, col: 12, text: '<el-timeline>' },
+          { pairId: 4, lineIdx: 16, col: 12, text: '</el-timeline>' },
+          { pairId: 5, lineIdx: 7, col: 16, text: '<el-timeline-item>' },
+          { pairId: 6, lineIdx: 15, col: 16, text: '</el-timeline-item>' },
+          { pairId: 7, lineIdx: 19, col: 16, text: '<el-input>' },
+          { pairId: 8, lineIdx: 21, col: 16, text: '</el-input>' }
+        ],
+        injections: [
+          { pairId: 1, lineIdx: 23, col: 0, text: '<template>' },
+          { pairId: 2, lineIdx: 21, col: 0, text: '</template>' },
+          { pairId: 3, lineIdx: 20, col: 12, text: '<el-timeline>' },
+          { pairId: 4, lineIdx: 22, col: 0, text: '</el-timeline>' },
+          { pairId: 5, lineIdx: 11, col: 24, text: '<el-timeline-item>' },
+          { pairId: 6, lineIdx: 17, col: 12, text: '</el-timeline-item>' },
+          { pairId: 7, lineIdx: 24, col: 0, text: '<el-input>' },
+          { pairId: 8, lineIdx: 25, col: 0, text: '</el-input>' }
+        ]
+      },
+
+      // Level 2: Java Spring Boot Controller — user-provided RelUserCityController.java
+      {
+        id: 2,
+        name: 'RelUserCityController.java',
+        lang: 'Java',
+        langMode: 'java',
+        breadcrumb: ['agri', 'datamanger', 'controller', 'RelUserCityController.java'],
+        code: `package com.agri.datamanger.controller;
+
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.agri.common.annotation.Log;
+import com.agri.common.core.controller.BaseController;
+import com.agri.common.core.domain.AjaxResult;
+import com.agri.common.core.domain.model.LoginUser;
+import com.agri.common.enums.BusinessType;
+import com.agri.datamanger.domain.RelUserCity;
+import com.agri.datamanger.service.IRelUserCityService;
+import com.agri.common.utils.StringUtils;
+import com.agri.common.utils.poi.ExcelUtil;
+import com.agri.common.core.page.TableDataInfo;
+import com.agri.framework.web.service.TokenService;
+
+/**
+ * 用户区域关系配置Controller
+ *
+ * @author sqj
+ * @date 2024-07-16
+ */
+@RestController
+@RequestMapping("/datamanger/usercity")
+public class RelUserCityController extends BaseController {
+
+    @Autowired
+    private IRelUserCityService relUserCityService;
+
+    @Autowired
+    private TokenService tokenService;
+
+    /**
+     * 查询用户区域关系配置列表
+     */
+    @PreAuthorize("@ss.hasPermi('datamanger:usercity:list')")
+    @GetMapping("/list")
+    public TableDataInfo list(RelUserCity relUserCity) {
+        if (getLoginUser().getUser().getRoles().stream().anyMatch(role -> role.getRoleKey().equals("webuser"))) {
+            relUserCity.setUserId(getLoginUser().getUserId());
+        }
+
+        startPage();
+        List<RelUserCity> list = relUserCityService.selectRelUserCityList(relUserCity);
+        return getDataTable(list);
+    }
+
+    /**
+     * 导出用户区域关系配置列表
+     */
+    @PreAuthorize("@ss.hasPermi('datamanger:usercity:export')")
+    @Log(title = "用户区域关系配置", businessType = BusinessType.EXPORT)
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, RelUserCity relUserCity) {
+        List<RelUserCity> list = relUserCityService.selectRelUserCityList(relUserCity);
+        ExcelUtil<RelUserCity> util = new ExcelUtil<RelUserCity>(RelUserCity.class);
+        util.exportExcel(response, list, "用户区域关系配置数据");
+    }
+
+    /**
+     * 获取用户区域关系配置详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('datamanger:usercity:query')")
+    @GetMapping(value = "/{userId}/{code}")
+    public AjaxResult getInfo(@PathVariable("userId") Long userId, @PathVariable("code") String code) {
+        return success(relUserCityService.selectRelUserCityByUserId(userId, code));
+    }
+
+    /**
+     * 新增用户区域关系配置
+     */
+    @PreAuthorize("@ss.hasPermi('datamanger:usercity:add')")
+    @Log(title = "用户区域关系配置", businessType = BusinessType.INSERT)
+    @PostMapping
+    public AjaxResult add(@RequestBody RelUserCity relUserCity) {
+        return toAjax(relUserCityService.insertRelUserCity(relUserCity));
+    }
+
+    /**
+     * 修改用户区域关系配置
+     */
+    @PreAuthorize("@ss.hasPermi('datamanger:usercity:edit')")
+    @Log(title = "用户区域关系配置", businessType = BusinessType.UPDATE)
+    @PutMapping
+    public AjaxResult edit(@RequestBody RelUserCity relUserCity) {
+        if (relUserCity.isDefault()) {
+            LoginUser loginUser = getLoginUser();
+            if (StringUtils.isNotNull(loginUser.getUser()) && loginUser.getUserId() == relUserCity.getUserId()) {
+                loginUser.setDefaultCode(relUserCity.getCode());
+                tokenService.setLoginUser(loginUser);
+            }
+        }
+
+        if(relUserCityService.selectRelUserCityByUserId(relUserCity.getUserId(), relUserCity.getOldCode()) == null){
+            return toAjax(relUserCityService.insertRelUserCity(relUserCity));
+        }
+        else{
+            return toAjax(relUserCityService.updateRelUserCity(relUserCity));
+        }
+    }
+
+    /**
+     * 删除用户区域关系配置
+     */
+    @PreAuthorize("@ss.hasPermi('datamanger:usercity:remove')")
+    @Log(title = "用户区域关系配置", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{userIds}/{codes}")
+    public AjaxResult remove(@PathVariable Long[] userIds, @PathVariable String[] codes) {
+        return toAjax(relUserCityService.deleteRelUserCityByUserIds(userIds, codes));
+    }
+}`,
+        pairs: [
+          { id: 1, keyword: '@PreAuthorize', display: '@PreAuthorize' },
+          { id: 2, keyword: '@GetMapping', display: '@GetMapping' },
+          { id: 3, keyword: '@PostMapping', display: '@PostMapping' },
+          { id: 4, keyword: '@Log', display: '@Log' },
+          { id: 5, keyword: 'public void', display: 'public void' },
+          { id: 6, keyword: 'public AjaxResult', display: 'public AjaxResult' },
+          { id: 7, keyword: 'public TableDataInfo', display: 'public TableDataInfo' },
+          { id: 8, keyword: 'IRelUserCityService', display: 'IRelUserCityService' },
+          { id: 9, keyword: 'RelUserCity', display: 'RelUserCity' },
+          { id: 10, keyword: 'return getDataTable', display: 'return getDataTable' }
+        ],
+        originalPositions: [
+          { pairId: 1, lineIdx: 34, col: 4, text: '@PreAuthorize' },
+          { pairId: 2, lineIdx: 35, col: 4, text: '@GetMapping' },
+          { pairId: 3, lineIdx: 45, col: 4, text: '@PostMapping' },
+          { pairId: 4, lineIdx: 44, col: 4, text: '@Log' },
+          { pairId: 5, lineIdx: 49, col: 8, text: 'public void' },
+          { pairId: 6, lineIdx: 60, col: 8, text: 'public AjaxResult' },
+          { pairId: 7, lineIdx: 36, col: 8, text: 'public TableDataInfo' },
+          { pairId: 8, lineIdx: 26, col: 16, text: 'IRelUserCityService' },
+          { pairId: 9, lineIdx: 37, col: 33, text: 'RelUserCity' },
+          { pairId: 10, lineIdx: 43, col: 8, text: 'return getDataTable' }
+        ],
+        injections: [
+          { pairId: 1, lineIdx: 54, col: 4, text: '@PreAuthorize' },
+          { pairId: 2, lineIdx: 57, col: 4, text: '@GetMapping' },
+          { pairId: 3, lineIdx: 67, col: 4, text: '@PostMapping' },
+          { pairId: 4, lineIdx: 66, col: 4, text: '@Log' },
+          { pairId: 5, lineIdx: 72, col: 8, text: 'public void' },
+          { pairId: 6, lineIdx: 83, col: 8, text: 'public AjaxResult' },
+          { pairId: 7, lineIdx: 58, col: 8, text: 'public TableDataInfo' },
+          { pairId: 8, lineIdx: 29, col: 16, text: 'IRelUserCityService' },
+          { pairId: 9, lineIdx: 61, col: 33, text: 'RelUserCity' },
+          { pairId: 10, lineIdx: 78, col: 8, text: 'return getDataTable' }
+        ]
+      },
+
+      // Level 3: TypeScript utility file
+      {
+        id: 3,
+        name: 'useTaskDetail.ts',
+        lang: 'TS',
+        langMode: 'js',
+        breadcrumb: ['graziery', 'src', 'hooks', 'useTaskDetail.ts'],
+        code: `import { ref, onMounted, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { getTaskDetailApi, updateTaskStatusApi } from '@/api/task';
+import type { TaskItem, TaskStatus } from '@/types/task';
+
+/**
+ * Task detail composable hook
+ *
+ * Provides reactive task data and CRUD operations for task management.
+ */
+export function useTaskDetail() {
+  const router = useRouter();
+  const route = useRoute();
+
+  const task = ref<TaskItem | null>(null);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
+
+  const taskId = computed(() => route.params.id as string);
+  const canEdit = computed(() => task.value?.status === 'draft');
+  const canSubmit = computed(() => task.value?.status === 'reviewing');
+
+  /**
+   * Fetch task detail by ID from API
+   */
+  async function fetchTask(): Promise<void> {
+    if (!taskId.value) {
+      error.value = 'No task ID provided';
+      return;
+    }
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const response = await getTaskDetailApi(taskId.value);
+      if (response.code === 200) {
+        task.value = response.data;
+        console.log('[useTaskDetail] Task loaded:', task.value.id);
+      } else {
+        error.value = response.message || 'Failed to load task';
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      error.value = message;
+      console.error('[useTaskDetail] Fetch failed:', message);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  /**
+   * Update task status
+   */
+  async function updateStatus(status: TaskStatus): Promise<boolean> {
+    if (!task.value) return false;
+
+    loading.value = true;
+    try {
+      const response = await updateTaskStatusApi(task.value.id, status);
+      if (response.code === 200) {
+        task.value = { ...task.value, status };
+        return true;
+      }
+      error.value = response.message || 'Failed to update status';
+      return false;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      error.value = message;
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  /**
+   * Navigate back to task list
+   */
+  function goBack(): void {
+    router.push({ name: 'task-list' });
+  }
+
+  // Auto-fetch on mount
+  onMounted(() => {
+    fetchTask();
+  });
+
+  return {
+    task,
+    loading,
+    error,
+    taskId,
+    canEdit,
+    canSubmit,
+    fetchTask,
+    updateStatus,
+    goBack
+  };
+}`,
+        pairs: [
+          { id: 1, keyword: 'ref(', display: 'ref(' },
+          { id: 2, keyword: 'computed(', display: 'computed(' },
+          { id: 3, keyword: 'async function', display: 'async function' },
+          { id: 4, keyword: 'const response = await', display: 'const response = await' },
+          { id: 5, keyword: 'onMounted', display: 'onMounted' },
+          { id: 6, keyword: 'error.value =', display: 'error.value =' },
+          { id: 7, keyword: 'loading.value = ', display: 'loading.value =' },
+          { id: 8, keyword: 'function goBack()', display: 'function goBack()' }
+        ],
+        originalPositions: [
+          { pairId: 1, lineIdx: 13, col: 10, text: 'ref(' },
+          { pairId: 2, lineIdx: 18, col: 20, text: 'computed(' },
+          { pairId: 3, lineIdx: 30, col: 2, text: 'async function' },
+          { pairId: 4, lineIdx: 39, col: 14, text: 'const response = await' },
+          { pairId: 5, lineIdx: 87, col: 2, text: 'onMounted' },
+          { pairId: 6, lineIdx: 35, col: 6, text: 'error.value =' },
+          { pairId: 7, lineIdx: 33, col: 6, text: 'loading.value = ' },
+          { pairId: 8, lineIdx: 80, col: 2, text: 'function goBack()' }
+        ],
+        injections: [
+          { pairId: 1, lineIdx: 15, col: 10, text: 'ref(' },
+          { pairId: 2, lineIdx: 22, col: 20, text: 'computed(' },
+          { pairId: 3, lineIdx: 59, col: 2, text: 'async function' },
+          { pairId: 4, lineIdx: 68, col: 14, text: 'const response = await' },
+          { pairId: 5, lineIdx: 89, col: 2, text: 'onMounted' },
+          { pairId: 6, lineIdx: 63, col: 6, text: 'error.value =' },
+          { pairId: 7, lineIdx: 62, col: 6, text: 'loading.value = ' },
+          { pairId: 8, lineIdx: 82, col: 2, text: 'function goBack()' }
+        ]
+      }
+    ];
+
+    // Current level reference (mutable)
+    function getCurrentLevel() { return LEVELS[currentLevelIdx]; }
+
+    // Override originalCode to use current level
+    Object.defineProperty(window, '__originalCode__', {
+      get: () => getCurrentLevel().code
+    });
+
+    // ========== 4b. Build injected code (level-aware) ==========
+    function buildInjectedCode() {
+      const level = getCurrentLevel();
+      const lines = level.code.split('\n');
+
+      const allInstances = [...level.originalPositions, ...level.injections];
+
+      // Sort by line desc, then col desc (to avoid offset issues when inserting)
+      allInstances.sort((a, b) => {
+        if (a.lineIdx !== b.lineIdx) return b.lineIdx - a.lineIdx;
+        return b.col - a.col;
+      });
+
+      for (const inst of allInstances) {
+        const line = lines[inst.lineIdx];
+        lines[inst.lineIdx] = line.substring(0, inst.col) + inst.text + line.substring(inst.col);
+      }
+
+      return lines;
+    }
+
+    // ========== 4c. Highlight dispatcher based on level language mode ==========
+    function dispatchHighlight(line, lineIdx) {
+      const mode = getCurrentLevel().langMode;
+      if (mode === 'vue') return highlightLine(line, lineIdx);
+      if (mode === 'java') return highlightJava(line);
+      return highlightJS(line);  // js/ts default
+    }
+
+    // ========== 4d. Render code (level-aware) ==========
+    function renderCode() {
+      const level = getCurrentLevel();
+      const lines = buildInjectedCode();
+      keywordElements = [];
+      pairMap = {};
+      pairsLeft = level.pairs.length;
+      for (let i = 1; i <= pairsLeft; i++) { pairMap[i] = []; }
+
+      let html = '';
+      let lineNumHtml = '';
+
+      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        const line = lines[lineIdx];
+        lineNumHtml += (lineIdx + 1) + '\n';
+
+        let lineHtml = '';
+        let lastIdx = 0;
+
+        // Collect all instances on this line
+        const lineInstances = [...level.originalPositions, ...level.injections]
+          .filter(inst => inst.lineIdx === lineIdx)
+          .sort((a, b) => a.col - b.col);
+
+        for (const inst of lineInstances) {
+          if (inst.col < lastIdx) continue; // overlapping? skip
+          const before = line.substring(lastIdx, inst.col);
+          lineHtml += dispatchHighlight(before, lineIdx);
+
+          const keywordId = 'kw-' + inst.pairId + '-' + lineIdx + '-' + inst.col;
+          const pairDef = level.pairs.find(p => p.id === inst.pairId);
+          const spanHtml = '<span class="keyword" id="' + keywordId + '" data-pair-id="' + inst.pairId + '" data-keyword="' + escHtml(pairDef.keyword) + '">' + pairDef.display + '</span>';
+          lineHtml += spanHtml;
+          lastIdx = inst.col + inst.text.length;
+        }
+
+        // Remaining part of line
+        if (lastIdx < line.length) {
+          lineHtml += dispatchHighlight(line.substring(lastIdx), lineIdx);
+        }
+
+        // If no keywords on this line, just highlight the whole line
+        if (lineInstances.length === 0) {
+          lineHtml = dispatchHighlight(line, lineIdx);
+        }
+
+        html += '<div class="code-line" data-line="' + lineIdx + '">' + lineHtml + '</div>\n';
+      }
+
+      codeFile.innerHTML = html;
+
+      codeFile.innerHTML = html;
+      lineNumbers.innerHTML = lineNumHtml.replace(/\n/g, '<br>');
+
+      // Attach click handlers to all keywords
+      document.querySelectorAll('.keyword').forEach(el => {
+        const pairId = parseInt(el.dataset.pairId);
+        if (!pairMap[pairId]) pairMap[pairId] = [];
+        pairMap[pairId].push(el);
+        el.addEventListener('click', (e) => onKeywordClick(e, el, pairId));
+        el.addEventListener('mouseenter', () => {
+          const lineIdx = parseInt(el.closest('.code-line').dataset.line);
+          positionText.textContent = 'Ln ' + (lineIdx + 1) + ', Col ' + (el.textContent.length + 1);
+        });
+      });
+    }
+
+    // ========== 5. Game Logic ==========
+    function onKeywordClick(e, el, pairId) {
+      e.stopPropagation();
+      if (lock || el.classList.contains('eliminated')) return;
+
+      // If clicking the same selected keyword, deselect
+      if (selectedKeyword && selectedKeyword.el === el) {
+        el.classList.remove('selected');
+        selectedKeyword = null;
+        return;
+      }
+
+      // If nothing selected, select this
+      if (!selectedKeyword) {
+        el.classList.add('selected');
+        selectedKeyword = { el, pairId };
+        return;
+      }
+
+      // Second click: check if same pair
+      if (selectedKeyword.pairId === pairId) {
+        // Match!
+        eliminatePair(pairId);
+      } else {
+        // Mismatch
+        el.classList.add('error');
+        combo = 0;
+        comboText.textContent = '';
+        score = Math.max(0, score - 10);
+        updateUI();
+        setTimeout(() => {
+          el.classList.remove('error');
+        }, 500);
+      }
+
+      // Deselect first
+      selectedKeyword.el.classList.remove('selected');
+      selectedKeyword = null;
+    }
+
+    function eliminatePair(pairId) {
+      lock = true;
+      const elements = pairMap[pairId];
+      if (!elements || elements.length !== 2) { lock = false; return; }
+
+      const [a, b] = elements;
+
+      // Flash green
+      a.classList.add('flash-ok');
+      b.classList.add('flash-ok');
+
+      setTimeout(() => {
+        a.classList.remove('flash-ok', 'selected');
+        b.classList.remove('flash-ok', 'selected');
+        a.classList.add('eliminated');
+        b.classList.add('eliminated');
+
+        // Score
+        combo++;
+        const multiplier = 1 + (combo - 1) * 0.5;
+        const points = Math.round(100 * multiplier);
+        score += points;
+        pairsLeft--;
+
+        updateUI();
+        showToast('+' + points + ' (Combo x' + multiplier.toFixed(1) + ')');
+
+        lock = false;
+
+        if (pairsLeft === 0) {
+          setTimeout(showVictory, 600);
+        }
+      }, 200);
+    }
+
+    function updateUI() {
+      codeIssues.textContent = '\u2717 ' + pairsLeft;
+      if (combo > 1) {
+        const multiplier = 1 + (combo - 1) * 0.5;
+        comboText.textContent = 'Combo x' + multiplier.toFixed(1);
+        comboText.classList.add('active');
+      } else {
+        comboText.textContent = '';
+        comboText.classList.remove('active');
+      }
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    function showVictory() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+      const timeBonus = Math.max(0, (180 - elapsed) * 5); // 3min target
+      score += timeBonus + 500;
+      document.getElementById('victory-score').textContent = 'Score: ' + score;
+      document.getElementById('victory-time').textContent = 'Time: ' + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+      victoryOverlay.classList.add('active');
+      setTimeout(() => {
+        victoryOverlay.classList.remove('active');
+      }, 4000);
+    }
+
+    // ========== 6. Hint ==========
+    function hint() {
+      if (lock) return;
+      // Find first uneliminated pair
+      for (let i = 1; i <= 8; i++) {
+        const els = pairMap[i];
+        if (els && els.length === 2) {
+          const a = els[0], b = els[1];
+          if (!a.classList.contains('eliminated')) {
+            a.classList.add('hint');
+            b.classList.add('hint');
+            score = Math.max(0, score - 50);
+            updateUI();
+            setTimeout(() => {
+              a.classList.remove('hint');
+              b.classList.remove('hint');
+            }, 1500);
+            return;
+          }
+        }
+      }
+      showToast('No duplicates found');
+    }
+
+    // ========== 7. Boss Key / Mask ==========
+    function setMask(active) {
+      isMaskActive = active;
+      if (active) {
+        // Show a different code file as mask
+        const maskCode = `import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { getTaskDetail } from '@/api/task';
+
+export function useTaskDetail() {
+  const route = useRoute();
+  const task = ref(null);
+  const loading = ref(false);
+
+  const fetchTask = async () => {
+    loading.value = true;
+    try {
+      const res = await getTaskDetail(route.params.id);
+      if (res.code === 200) {
+        task.value = res.data;
+      }
+    } catch (err) {
+      console.error('Failed to fetch task:', err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  onMounted(fetchTask);
+
+  return { task, loading, fetchTask };
+}`;
+        const maskLines = maskCode.split('\n');
+        let maskHtml = '';
+        for (let i = 0; i < maskLines.length; i++) {
+          maskHtml += highlightJS(maskLines[i]) + '\n';
+        }
+        maskContent.innerHTML = maskHtml;
+        maskLineNumbers.innerHTML = Array.from({length: maskLines.length}, (_, i) => i + 1).join('<br>');
+        maskPage.classList.add('active');
+      } else {
+        maskPage.classList.remove('active');
+      }
+    }
+
+    // ========== 8. Level Switcher & Event Listeners ==========
+    const langLabel = document.getElementById('lang-label'); // "Vue" label in status bar
+
+    function switchLevel(idx) {
+      if (idx < 0 || idx >= LEVELS.length || idx === currentLevelIdx) return;
+      currentLevelIdx = idx;
+      const level = getCurrentLevel();
+
+      // Reset game state
+      selectedKeyword = null;
+      lock = false;
+      isMaskActive = false;
+      maskPage.classList.remove('active');
+      score = 0; combo = 0;
+      startTime = Date.now();
+      victoryOverlay.classList.remove('active');
+
+      // Update UI elements
+      if (tabLabel) tabLabel.textContent = level.name;
+      if (tabIcon) {
+        tabIcon.textContent = level.lang === 'Vue' ? 'V' : level.lang === 'Java' ? 'J' : 'T';
+        tabIcon.style.background = level.lang === 'Vue' ? '#42b883' : level.lang === 'Java' ? '#f89820' : '#3178c6';
+      }
+      // Update breadcrumb
+      const bcEl = document.querySelector('.breadcrumb');
+      if (bcEl && level.breadcrumb) {
+        let bcHtml = '';
+        for (let i = 0; i < level.breadcrumb.length; i++) {
+          if (i > 0) bcHtml += '<span class="sep">/</span>';
+          const isLast = i === level.breadcrumb.length - 1;
+          bcHtml += '<span' + (isLast ? ' style="opacity:1;"' : '') + '>' + escHtml(level.breadcrumb[i]) + '</span>';
+        }
+        bcEl.innerHTML = bcHtml;
+      }
+      // Update lang label
+      if (langLabel) langLabel.textContent = level.lang;
+
+      renderCode();
+      updateUI();
+      console.log('[CoderTreasure] Switched to Level ' + (idx+1) + ': ' + level.name + ' (' + level.pairs.length + ' pairs)');
+    }
+
+    // Make lang label clickable — shows a quick level picker
+    if (langLabel) {
+      langLabel.title = 'Switch level: click to change file (Vue \u2192 Java \u2192 TS)';
+      langLabel.addEventListener('click', () => {
+        // Cycle through levels on click
+        switchLevel((currentLevelIdx + 1) % LEVELS.length);
+      });
+    }
+
+    document.getElementById('hint-btn').addEventListener('click', hint);
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      const level = getCurrentLevel();
+      score = 0; combo = 0; pairsLeft = level.pairs.length; selectedKeyword = null; lock = false; startTime = Date.now();
+      renderCode();
+      updateUI();
+      victoryOverlay.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.altKey && e.key === 'F12') { e.preventDefault(); setMask(!isMaskActive); }
+      else if (e.key === 'Escape') { e.preventDefault(); setMask(true); }
+      // Ctrl+L or Cmd+L: next level
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        switchLevel((currentLevelIdx + 1) % LEVELS.length);
+      }
+    });
+
+    // VS Code theme & settings message
+    const vscode = (typeof acquireVsCodeApi === 'function') ? acquireVsCodeApi() : null;
+    if (vscode) {
+      window.addEventListener('message', (event) => {
+        const message = event.data;
+        if (!message) return;
+        if (message.type === 'theme') {
+          document.documentElement.classList.toggle('light', message.theme === 'light');
+        }
+        if (message.type === 'settings') {
+          // Apply user's VS Code editor font settings as CSS variables
+          const root = document.documentElement;
+          if (message.fontFamily) root.style.setProperty('--vscode-font-family', message.fontFamily);
+          if (message.fontSize) root.style.setProperty('--vscode-font-size', message.fontSize + 'px');
+          console.log('[CoderTreasure] Applied settings: font=' + message.fontFamily + ' size=' + message.fontSize);
+        }
+      });
+      try { vscode.postMessage({ type: 'ready' }); } catch (e) { console.error('postMessage failed', e); }
+    }
+
+    // ========== 9. Init ==========
+    try {
+      const level = getCurrentLevel();
+      // Set initial UI from first level
+      if (tabLabel) tabLabel.textContent = level.name;
+      if (tabIcon) {
+        tabIcon.textContent = level.lang === 'Vue' ? 'V' : level.lang === 'Java' ? 'J' : 'T';
+        tabIcon.style.background = level.lang === 'Vue' ? '#42b883' : level.lang === 'Java' ? '#f89820' : '#3178c6';
+      }
+      renderCode();
+      updateUI();
+      console.log('[CoderTreasure] Game initialized: Level 1 - ' + level.name + ' (' + level.pairs.length + ' pairs, ' + LEVELS.length + ' levels total)');
+    } catch (err) {
+      console.error('[CoderTreasure] Init failed:', err);
+      codeFile.innerHTML = '<div style="padding:20px;color:#f44747;font-family:monospace;">Error: ' + String(err.message) + '</div>';
+    }
+  })();
+  </script>
+</body>
+</html>

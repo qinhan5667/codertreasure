@@ -1,0 +1,92 @@
+{
+  "name": "codertreasure",
+  "displayName": "CoderTreasure",
+  "description": "A code pairing game disguised as a real VS Code editor. Find duplicate keywords in Vue/Java/TypeScript code — looks like you're doing serious code review! / 伪装成代码审查的配对消除游戏，支持 Vue/Java/TS 多关卡",
+  "version": "2.6.0",
+  "publisher": "qinhan",
+  "repository": "https://github.com/qinhan5667/codertreasure.git",
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "game",
+    "fun",
+    "pairing",
+    "code review",
+    "Vue",
+    "Java",
+    "TypeScript",
+    "syntax highlighting",
+    "boss key"
+  ],
+  "activationEvents": [
+    "onCommand:codertreasure.start",
+    "onCommand:codertreasure.helloWorld",
+    "onCommand:codertreasure.NowDate"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codertreasure.helloWorld",
+        "title": "Hello VS Code"
+      },
+      {
+        "command": "codertreasure.NowDate",
+        "title": "Now Date"
+      },
+      {
+        "command": "codertreasure.start",
+        "title": "Start new coding",
+        "category": "Coding"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "ctrl+alt+h",
+        "command": "codertreasure.helloWorld"
+      },
+      {
+        "key": "ctrl+alt+d",
+        "command": "codertreasure.NowDate"
+      },
+      {
+        "key": "ctrl+alt+s",
+        "command": "codertreasure.start"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "generate": "node scripts/generate-snippets.js",
+    "compile": "npm run generate && npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run generate && npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.24.2",
+    "eslint": "^9.19.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.7.3"
+  }
+}
