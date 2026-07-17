@@ -3,7 +3,7 @@
 **A stealthy code-refactoring disguised pairing game for VS Code. 100% looks like a real code editor — even your boss won't notice.**
 **一个伪装成代码重构审查的 VS Code 配对消除游戏——极致伪装，老板路过也看不出！**
 
-Plugin developer: Qin Han / 插件开发者：秦瀚
+Plugin developer: Qin Han
 
 **GitHub**: https://github.com/qinhan5667/codertreasure ⭐ Star 欢迎！
 
