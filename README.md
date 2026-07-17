@@ -39,10 +39,33 @@ Plugin developer: Qin Han
 
 ### 我下载了这个插件之后怎么用？
 
-**第一步：安装**
+#### 方法 A：VS Code 扩展市场安装（推荐）
+
 1. 在 VS Code 扩展市场搜索 `CoderTreasure`
-2. 点「安装」（或从 [Releases](https://github.com/qinhan5667/codertreasure/releases) 下载 .vsix 文件手动安装）
+2. 点「安装」
 3. **重启 VS Code**
+
+#### 方法 B：下载 .vsix 手动安装（适用于所有 VS Code 系 IDE）
+
+> **CoderTreasure 可以安装在以下所有基于 VS Code 的 IDE 中：**
+
+| IDE | 基于 VS Code | 安装方式 | 兼容性 |
+|-----|:---:|------|:---:|
+| **VS Code** | ✅ 原版 | 扩展市场搜索 / .vsix 安装 | ✅ 完全兼容 |
+| **Trae（字节跳动）** | ✅ 是 | 下载 .vsix → 扩展面板 → `...` → Install from VSIX | ✅ 高 |
+| **CodeBuddy** | ✅ 是 | 同上 | ✅ 高 |
+| **Cursor** | ✅ 是 | 同上 / 扩展商店搜索 | ✅ 高 |
+| **Windsurf** | ✅ 是 | 同上 | ✅ 高 |
+| **Codium（VSCodium）** | ✅ 是 | 同上 / Open VSX 搜索 | ✅ 高 |
+| **Theia** | ⚠️ 部分 | .vsix 可能不通用，需从源码构建 | ⚠️ 中 |
+
+**.vsix 手动安装步骤（通用）：**
+
+1. 从 [GitHub Releases](https://github.com/qinhan5667/codertreasure/releases) 下载最新版 `codertreasure-x.x.x.vsix`
+2. 在你的 IDE 中打开**扩展面板**（左侧图标或 `Ctrl+Shift+X`）
+3. 点击右上角 `...` 菜单 → 选择 **Install from VSIX...**
+4. 选择下载的 `.vsix` 文件
+5. **重启 IDE**
 
 **第二步：启动游戏**
 - 按 `Ctrl+Alt+S` 即可启动游戏面板
@@ -231,7 +254,7 @@ A: 可能原因：
 2. `game.html` 中有 JavaScript 语法错误 — 查看 Debug Console
 
 **Q: 可以在其他 IDE（WebStorm / IDEA / Cursor / Trae）上用吗？**
-A: 这些 IDE 都基于 VS Code 内核，支持 `.vsix` 安装方式。扩展面板 → `...` → Install from VSIX 即可安装。
+A: 可以！详见上方 **「用户使用指南 → 方法 B：下载 .vsix 手动安装」** 的完整 IDE 兼容性表格。所有基于 VS Code 内核的 IDE 都支持 `.vsix` 安装。非 VS Code 系的 IDE（如 WebStorm / IntelliJ IDEA）暂不支持。
 
 **Q: 如何添加新的关卡？**
 A: 编辑 `src/game.html`，找到 `LEVELS = [` 数组追加新关卡对象即可。
@@ -242,6 +265,12 @@ A: 这是故意的！大部分元素是装饰用的，只有语言标签（Vue/J
 ---
 
 ## Changelog / 变更记录
+
+### v2.6.1 (2026-07-17) — 市场页优化 & README 重排
+- ✅ README 图片引用改用 GitHub Raw URL（修复市场页图片显示失败）
+- ✅ README 结构重排：截图 + 使用指南 + 怎么玩提到最前面
+- ✅ 新增多 IDE 安装指南（Trae / CodeBuddy / Cursor / Windsurf / Codium）
+- ✅ 新增 GitHub 仓库链接（顶部 + 各章节）
 
 ### v2.6.0 (2026-07-17) — 市场发布 & 协议更新
 - ✅ 正式发布到 VS Code Marketplace
