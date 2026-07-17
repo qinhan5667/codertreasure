@@ -2,7 +2,7 @@
   "name": "codertreasure",
   "displayName": "CoderTreasure",
   "description": "A code pairing game disguised as a real VS Code editor. Find duplicate keywords in Vue/Java/TypeScript code — looks like you're doing serious code review! / 伪装成代码审查的配对消除游戏，支持 Vue/Java/TS 多关卡",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "publisher": "qinhan",
   "repository": "https://github.com/qinhan5667/codertreasure.git",
   "icon": "images/icon.png",
