@@ -17,9 +17,9 @@ Plugin developer: Qin Han / 插件开发者：秦瀚
 
 ## 📸 效果截图 / Screenshots
 
-### Level 1: Vue SFC（Vue 关卡）
-![Vue Level](https://raw.githubusercontent.com/qinhan5667/codertreasure/main/images/screenshot-java-level.png)
-*在真实的 Vue/Java/TypeScript 代码中找出重复关键字 — 看起来就像在做严肃的 code review*
+### Level 2: Java Spring Boot（Java 关卡）
+![Java Level](https://raw.githubusercontent.com/qinhan5667/codertreasure/main/images/screenshot-java-level.png)
+*在真实的 Java Controller 代码中找出重复的注解和方法名 — 伪装成严肃的 code review*
 
 ### Level 3: TypeScript Composable（TS 关卡）
 ![TS Level](https://raw.githubusercontent.com/qinhan5667/codertreasure/main/images/screenshot-ts-level.png)
